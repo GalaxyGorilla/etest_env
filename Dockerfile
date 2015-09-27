@@ -5,11 +5,11 @@ ENV PATH /usr/local/bin:/usr/bin:$PATH
 #BASIC PACKAGES
 run apt-get -y update \
     && apt-get install -y git build-essential libncurses5-dev openssl \
-       libssl-dev curl m4 vim
+       libssl-dev curl m4 vim openssh-server
 
 #UTF-8 SETUP FOR ELIXIR
-run echo \
-"
+run locale-gen en_US.UTF-8 && echo \
+" \
 export LC_ALL=en_US.UTF-8 \
 export LANG=en_US.UTF-8 \
 export LANGUAGE=en_US.UTF-8 \
@@ -37,6 +37,9 @@ run    mkdir ~/.kerl/installs/17.4 && kerl install 17.4 ~/.kerl/installs/17.4 \
     && mkdir ~/.kerl/installs/18.0 && kerl install 18.0 ~/.kerl/installs/18.0 \
     && mkdir ~/.kerl/installs/18.1 && kerl install 18.1 ~/.kerl/installs/18.1 
 
+#CLEANUP
+run rm -rf ~/.kerl/builds/*
+
 #DEFAULT ERLANG
 run echo ". ~/.kerl/installs/17.4/activate" >> ~/.bashrc
 
@@ -46,9 +49,11 @@ run echo 'test -s "$HOME/.kiex/scripts/kiex" && source "$HOME/.kiex/scripts/kiex
 run ln -s ~/.kiex/bin/kiex /usr/local/bin/kiex 
     
 run /bin/bash -c -i 'source ~/.bashrc \
-    && kiex install 1.1.0-rc.0 \
+    && kiex install 1.1.0 \
     && kiex install 1.0.5 \ 
     && kiex install 1.0.3 \ 
-    && kiex default 1.1.0-rc.0'
+    && kiex default 1.1.0 \
+    && kiex use 1.1.0'
 
-run cd
+#SETUP MIX AND REBAR
+run /bin/bash -c -i 'yes | mix local.hex && yes | mix local.rebar'
